@@ -13,6 +13,7 @@ setup(
     description='A library designed for kasflows between a server and a cheat script in Roblox, kasflows is an imitation and/or alternative mechanics of websockets made with API requests.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
+    url='https://github.com/KaSpEr-tv123/kasflows',
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
