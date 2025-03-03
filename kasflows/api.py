@@ -29,7 +29,7 @@ async def checkws(request: Request):
         connections[data["name"]]["time"] = datetime.datetime.now()
         return {"status": "already connected"}
     else:
-        connections[data["name"]] = {"token": data["token"], "time": datetime.datetime.now()}
+        connections[data["name"]] = {"time": datetime.datetime.now()}
         Kasflows.emit("connect", data)
         return {"status": "connected"}
 
@@ -38,7 +38,6 @@ async def getmessage(request: Request):
     data = await request.json()
     if data["name"] in Kasflows.messageforclient:
         message = Kasflows.messageforclient[data["name"]]
-        Kasflows.emit(data["name"], message)
         return {"status": "success", "message": message}
     else:
         return {"status": "no message"}
@@ -48,6 +47,16 @@ async def sendmessage(request: Request):
     data = await request.json()
     Kasflows.emit(data["event"], data["data"])
     return {"status": "success"}
+
+@app.post("/sendmessagetoclient")
+async def sendmessagetoclient(request: Request):
+    data = await request.json()
+    Kasflows.messageforclient[data["name"]] = data["message"]
+    return {"status": "success"}
+
+@app.get("/getclients")
+async def getclients():
+    return {"clients": connections}
 
 def start(host: str = "127.0.0.1", port: int = 8000, reload: bool = True):
     uvicorn.run(app, host=host, port=port, reload=reload)

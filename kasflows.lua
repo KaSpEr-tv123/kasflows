@@ -6,21 +6,26 @@ KasflowsClient.__index = KasflowsClient
 function KasflowsClient.new(serverUrl)
     local self = setmetatable({}, KasflowsClient)
     self.serverUrl = serverUrl
-    self.eventsCallbacks = {
-        connect = {},
-        disconnect = {},
-        messageserver = {},
-        messageclient = {}
-    }
+    self.eventsCallbacks = {}
     self.isConnected = false
     return self
 end
 
 function KasflowsClient:on(event, callback)
+    if not self.eventsCallbacks[event] then
+        self.eventsCallbacks[event] = {}
+    end
+    table.insert(self.eventsCallbacks[event], callback)
+end
+
+function KasflowsClient:off(event, callback)
     if self.eventsCallbacks[event] then
-        table.insert(self.eventsCallbacks[event], callback)
-    else
-        error("Event '" .. event .. "' is not supported")
+        for i, cb in ipairs(self.eventsCallbacks[event]) do
+            if cb == callback then
+                table.remove(self.eventsCallbacks[event], i)
+                break
+            end
+        end
     end
 end
 
@@ -29,12 +34,10 @@ function KasflowsClient:emit(event, data)
         for _, callback in ipairs(self.eventsCallbacks[event]) do
             callback(data)
         end
-    else
-        error("Event '" .. event .. "' is not supported")
     end
 end
 
-function KasflowsClient:connect(name, token)
+function KasflowsClient:connect(name)
     local success, response = pcall(function()
         return HttpService:PostAsync(self.serverUrl .. "/statusws", HttpService:JSONEncode({
             name = name,
@@ -44,17 +47,11 @@ function KasflowsClient:connect(name, token)
 
     if success then
         local responseData = HttpService:JSONDecode(response)
-        if responseData.status == "connected" then
-            self.isConnected = true
-            self:emit("connect", {
-                name = name
-            })
-            self:startListening(name)
-        elseif responseData.status == "already connected" then
+        if responseData.status == "connected" or responseData.status == "already connected" then
             self.isConnected = true
             self:emit("connect", {
                 name = name,
-                already_connected = true
+                already_connected = responseData.status == "already connected"
             })
             self:startListening(name)
         else
@@ -65,21 +62,18 @@ function KasflowsClient:connect(name, token)
     end
 end
 
-function KasflowsClient:sendMessage(name, message)
+function KasflowsClient:sendMessage(event, data)
     local success, response = pcall(function()
         return HttpService:PostAsync(self.serverUrl .. "/sendmessage", HttpService:JSONEncode({
-            name = name,
-            message = message
+            event = event,
+            data = data
         }), Enum.HttpContentType.ApplicationJson)
     end)
 
     if success then
         local responseData = HttpService:JSONDecode(response)
         if responseData.status == "success" then
-            self:emit("messageserver", {
-                name = name,
-                message = message
-            })
+            self:emit(event, data)
         else
             error("Failed to send message: " .. responseData.status)
         end
@@ -98,28 +92,18 @@ function KasflowsClient:getMessage(name)
     if success then
         local responseData = HttpService:JSONDecode(response)
         if responseData.status == "success" then
-            self:emit("messageclient", {
-                name = name,
-                message = responseData.message
-            })
-        elseif responseData.status == "no message" then
-            self:emit("messageclient", {
-                name = name,
-                message = nil
-            })
-        else
-            error("Failed to get message: " .. responseData.status)
+            self:emit(responseData.message.event, responseData.message.data)
         end
     else
         error("HTTP request failed while getting message")
     end
 end
 
-function KasflowsClient:startListening(name)
+function KasflowsClient:start()
     spawn(function()
         while self.isConnected do
-            wait(3) -- Интервал обновления сообщений
-            self:getMessage(name)
+            wait()
+            self:getMessage(game.Players.LocalPlayer.Name)
         end
     end)
 end
