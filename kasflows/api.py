@@ -1,9 +1,18 @@
 from fastapi import FastAPI, Request
 import uvicorn, threading, datetime
 from kasflows.kasflows import Kasflows
+import requests
 
 app = FastAPI()
 connections = {}
+
+class Client(Kasflows):
+    def __init__(self, url: str):
+        super().__init__()
+        self.url = url
+
+    def emit(self, event, data):
+        requests.post(self.url, json={"event": event, "data": data})
 
 def disconnect_checker():
     while True:
@@ -32,6 +41,16 @@ async def checkws(request: Request):
         connections[data["name"]] = {"time": datetime.datetime.now()}
         Kasflows.emit("connect", data)
         return {"status": "connected"}
+
+@app.post("/disconnect")
+async def disconnect(request: Request):
+    data = await request.json()
+    if data["name"] in connections:
+        del connections[data["name"]]
+        Kasflows.emit("disconnect", data)
+        return {"status": "disconnected"}
+    else:
+        return {"status": "not connected"}
 
 @app.post("/getmessage")
 async def getmessage(request: Request):

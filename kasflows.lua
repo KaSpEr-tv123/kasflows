@@ -12,28 +12,16 @@ function KasflowsClient.new(serverUrl)
 end
 
 function KasflowsClient:on(event, callback)
-    if not self.eventsCallbacks[event] then
-        self.eventsCallbacks[event] = {}
-    end
-    table.insert(self.eventsCallbacks[event], callback)
+    self.eventsCallbacks[event] = callback
 end
 
-function KasflowsClient:off(event, callback)
-    if self.eventsCallbacks[event] then
-        for i, cb in ipairs(self.eventsCallbacks[event]) do
-            if cb == callback then
-                table.remove(self.eventsCallbacks[event], i)
-                break
-            end
-        end
-    end
+function KasflowsClient:off(event)
+    self.eventsCallbacks[event] = nil
 end
 
 function KasflowsClient:emit(event, data)
     if self.eventsCallbacks[event] then
-        for _, callback in ipairs(self.eventsCallbacks[event]) do
-            callback(data)
-        end
+        self.eventsCallbacks[event](data)
     end
 end
 
@@ -101,6 +89,7 @@ end
 
 function KasflowsClient:start()
     spawn(function()
+        self:connect(game.Players.LocalPlayer.Name)
         while self.isConnected do
             wait()
             self:getMessage(game.Players.LocalPlayer.Name)
@@ -110,7 +99,22 @@ end
 
 function KasflowsClient:disconnect()
     self.isConnected = false
-    self:emit("disconnect", {})
+    local success, response = pcall(function()
+        return HttpService:PostAsync(self.serverUrl .. "/disconnect", HttpService:JSONEncode({
+            name = game.Players.LocalPlayer.Name
+        }), Enum.HttpContentType.ApplicationJson)
+    end)
+
+    if success then
+        local responseData = HttpService:JSONDecode(response)
+        if responseData.status == "success" then
+            self:emit("disconnect", {})
+        else
+            error("Failed to disconnect: " .. responseData.status)
+        end
+    else
+        error("HTTP request failed while disconnecting")
+    end
 end
 
 return KasflowsClient

@@ -8,6 +8,9 @@ setup(
         "fastapi",
         "uvicorn",
         "pydantic",
+        "requests",
+        "threading",
+        "datetime"
     ],
     author='kasperenok',
     description='KasFlows is a lightweight event-driven communication system designed as an alternative to WebSockets, specifically created for Roblox cheats scripts. It provides a simple and flexible way to handle client-server communication using FastAPI.',

@@ -2,32 +2,20 @@ import logging
 
 class Kasflows:
     def __init__(self):
-        self.eventsCallbacks = {
-            "connect": [],
-            "disconnect": [],
-            "messageserver": [],
-            "messageclient": []
-        }
+        self.eventsCallbacks = {}
         self.messageforclient = {}
 
     def on(self, event: str, callback: callable):
-        if event in self.eventsCallbacks:
-            self.eventsCallbacks[event].append(callback)
+            self.eventsCallbacks[event] = callback
             logging.info(f"Callback added for event '{event}'")
-        else:
-            raise ValueError(f"Event '{event}' is not supported")
 
-    def off(self, event: str, callback: callable):
-        if event in self.eventsCallbacks:
-            self.eventsCallbacks[event].remove(callback)
+    def off(self, event: str):
+            del self.eventsCallbacks[event]
             logging.info(f"Callback removed for event '{event}'")
-        else:
-            raise ValueError(f"Event '{event}' is not supported")
 
-    def emit(self, event: str, data: dict, *args, **kwargs):
+    def emit(self, event: str, data: dict):
         if event in self.eventsCallbacks:
-            for callback in self.eventsCallbacks[event]:
-                callback(data, *args, **kwargs)
+            self.eventsCallbacks[event](data)
             logging.info(f"Event '{event}' emitted with data: {data}")
         else:
             raise ValueError(f"Event '{event}' is not supported")
