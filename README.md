@@ -1,10 +1,10 @@
-### **KasFlows Documentation**  
+# KasFlows Documentation
 
-KasFlows is a lightweight event-driven communication system designed as an alternative to WebSockets, specifically created for Roblox cheats scripts. It provides a simple and flexible way to handle client-server communication using FastAPI.  
+KasFlows is a lightweight event-driven communication system designed as an alternative to WebSockets, specifically created for Roblox cheats scripts. It provides a simple and flexible way to handle client-server communication using FastAPI.
 
 ---
 
-## **Installation**  
+## Installation
 
 ```bash
 pip install kasflows
@@ -12,31 +12,26 @@ pip install kasflows
 
 ---
 
-## **Core Components**  
+## Core Components
 
-The library consists of two main components:  
+The library consists of two main components:
 
-1. **KasFlows API Server (`api.py`)**  
-   - Manages client connections and disconnections.  
-   - Handles message exchange between clients and server.  
-   - Automatically disconnects inactive clients after **10 seconds**.  
-   - Provides a simple HTTP API for sending and receiving messages.  
+1. **KasFlows API Server (`api.py`)**
+   - Manages client connections and disconnections.
+   - Handles message exchange between clients and server.
+   - Automatically disconnects inactive clients after **10 seconds**.
+   - Provides a simple HTTP API for sending and receiving messages.
 
-2. **KasFlows Event System (`kasflows.py`)**  
-   - Provides an event-driven architecture.  
-   - Supports event registration (`on`), removal (`off`), and triggering (`emit`).  
-   - Handles four main events:
-     - `connect` – Triggered when a client connects.  
-     - `disconnect` – Triggered when a client disconnects.  
-     - `messageserver` – Triggered when the server receives a message.  
-     - `messageclient` – Triggered when a client receives a message.  
+2. **KasFlows Event System (`kasflows.py`)**
+   - Provides an event-driven architecture.
+   - Supports event registration (`on`), removal (`off`), and triggering (`emit`).
 
 ---
 
-## **Basic Usage**  
+## Basic Usage
 
-### **1. Starting the Server**  
-The API server is built with FastAPI and can be started using the `start()` function.  
+### 1. Starting the Server
+The API server is built with FastAPI and can be started using the `start()` function.
 
 ```python
 from kasflows import start
@@ -47,11 +42,11 @@ start(host="127.0.0.1", port=8000)
 
 ---
 
-### **2. Event Handling**  
+### 2. Event Handling
 
-KasFlows uses an event-driven system to handle client interactions.  
+KasFlows uses an event-driven system to handle client interactions.
 
-#### **Registering Event Handlers**  
+#### Registering Event Handlers
 
 ```python
 from kasflows import Kasflows
@@ -67,14 +62,14 @@ Kasflows.on("connect", on_connect)
 Kasflows.on("messageserver", on_message)
 ```
 
-#### **Removing Event Handlers**  
+#### Removing Event Handlers
 
 ```python
 Kasflows.off("connect", on_connect)
 Kasflows.off("messageserver", on_message)
 ```
 
-#### **Manually Emitting Events**  
+#### Manually Emitting Events
 
 ```python
 Kasflows.emit("messageserver", {"name": "client1", "message": "Hello"})
@@ -82,13 +77,13 @@ Kasflows.emit("messageserver", {"name": "client1", "message": "Hello"})
 
 ---
 
-## **API Endpoints**  
+## API Endpoints
 
-KasFlows provides simple HTTP endpoints for handling client communication.  
+KasFlows provides simple HTTP endpoints for handling client communication.
 
-### **1. Client Connection (`POST /statusws`)**  
+### 1. Client Connection (`POST /statusws`)
 
-**Request:**  
+**Request:**
 
 ```json
 {
@@ -97,14 +92,14 @@ KasFlows provides simple HTTP endpoints for handling client communication.
 }
 ```
 
-**Response:**  
+**Response:**
 
 ```json
 {
   "status": "connected"
 }
 ```
-or  
+or
 ```json
 {
   "status": "already connected"
@@ -113,9 +108,9 @@ or
 
 ---
 
-### **2. Sending Messages (`POST /sendmessage`)**  
+### 2. Sending Messages (`POST /sendmessage`)
 
-**Request:**  
+**Request:**
 
 ```json
 {
@@ -124,7 +119,7 @@ or
 }
 ```
 
-**Response:**  
+**Response:**
 
 ```json
 {
@@ -134,9 +129,9 @@ or
 
 ---
 
-### **3. Receiving Messages (`POST /getmessage`)**  
+### 3. Receiving Messages (`POST /getmessage`)
 
-**Request:**  
+**Request:**
 
 ```json
 {
@@ -144,7 +139,7 @@ or
 }
 ```
 
-**Response (when message available):**  
+**Response (when message available):**
 
 ```json
 {
@@ -153,7 +148,7 @@ or
 }
 ```
 
-**Response (when no message available):**  
+**Response (when no message available):**
 
 ```json
 {
@@ -163,7 +158,7 @@ or
 
 ---
 
-## **Features**  
+## Features
 
 ✅ **Automatic Client Disconnection** – Clients are removed if inactive for **10 seconds**.  
 ✅ **Event-Driven Architecture** – Uses `on`, `off`, and `emit` for handling events.  
@@ -172,7 +167,7 @@ or
 
 ---
 
-## **Example: Full Implementation**  
+## Example: Full Implementation
 
 ```python
 from kasflows import Kasflows, start
@@ -198,6 +193,6 @@ start(host="127.0.0.1", port=8000)
 
 ---
 
-## **License**  
+## License
 
-KasFlows is released under the **MIT License**.  
+KasFlows is released under the **MIT License**.

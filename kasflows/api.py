@@ -38,7 +38,7 @@ async def getmessage(request: Request):
     data = await request.json()
     if data["name"] in Kasflows.messageforclient:
         message = Kasflows.messageforclient[data["name"]]
-        Kasflows.emit("messageclient", {"name": data["name"], "message": message})
+        Kasflows.emit(data["name"], message)
         return {"status": "success", "message": message}
     else:
         return {"status": "no message"}
@@ -46,7 +46,7 @@ async def getmessage(request: Request):
 @app.post("/sendmessage")
 async def sendmessage(request: Request):
     data = await request.json()
-    Kasflows.emit("messageserver", data)
+    Kasflows.emit(data["event"], data["data"])
     return {"status": "success"}
 
 def start(host: str = "127.0.0.1", port: int = 8000, reload: bool = True):

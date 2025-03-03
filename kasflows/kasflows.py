@@ -10,11 +10,6 @@ class Kasflows:
         }
         self.messageforclient = {}
 
-        self.on("connect", lambda data: print(f"Connected: {data}"))
-        self.on("disconnect", lambda data: print(f"Disconnected: {data}"))
-        self.on("messageserver", lambda data: print(f"Message from server: {data}"))
-        self.on("messageclient", lambda data: print(f"Message to client: {data}"))
-
     def on(self, event: str, callback: callable):
         if event in self.eventsCallbacks:
             self.eventsCallbacks[event].append(callback)

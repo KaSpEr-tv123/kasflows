@@ -10,7 +10,7 @@ setup(
         "pydantic",
     ],
     author='kasperenok',
-    description='A library designed for kasflows between a server and a cheat script in Roblox, kasflows is an imitation and/or alternative mechanics of websockets made with API requests.',
+    description='KasFlows is a lightweight event-driven communication system designed as an alternative to WebSockets, specifically created for Roblox cheats scripts. It provides a simple and flexible way to handle client-server communication using FastAPI.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/KaSpEr-tv123/kasflows',
